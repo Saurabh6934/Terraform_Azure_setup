@@ -1,0 +1,23 @@
+trigger: none
+
+pool: skp-pool-nov
+
+jobs:
+  - job: Terraform init
+    displayName: Init
+    steps:
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'first_sc_nov'
+        backendAzureRmStorageAccountName: 'skpstoragebackend'
+        backendAzureRmContainerName: 'skp-container'
+        backendAzureRmKey: 'saurabhtf.tfstate'
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'validate'
