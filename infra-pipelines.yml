@@ -3,7 +3,7 @@ trigger: none
 pool: skp-pool-nov
 
 jobs:
-  - job: Terraform init
+  - job: Terraform_init
     displayName: Init
     steps:
     - task: TerraformInstaller@1
