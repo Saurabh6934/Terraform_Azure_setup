@@ -15,6 +15,7 @@ jobs:
       inputs:
         provider: 'azurerm'
         command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
         backendServiceArm: 'first_sc_nov'
         backendAzureRmStorageAccountName: 'skpstoragebackend'
         backendAzureRmContainerName: 'skp-container'
