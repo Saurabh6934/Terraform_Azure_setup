@@ -8,7 +8,7 @@ resource "azurerm_virtual_network" "vnet" {
   tags                = each.value.tags
 
   dynamic "subnet" {
-    for_each = each.value.subnet
+    for_each = each.value.subnets
     
     content {
       name = subnet.value.name
