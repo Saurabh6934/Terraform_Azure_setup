@@ -25,11 +25,13 @@ jobs:
       inputs:
         provider: 'azurerm'
         command: 'validate'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
     - task: TerraformTask@5
       displayName: Terraform fmt
       inputs:
         provider: 'azurerm'
         command: 'custom'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
         commandOptions: 'fmt'
         outputTo: 'console'
         environmentServiceNameAzureRM: 'first_sc_nov'
@@ -38,4 +40,5 @@ jobs:
       inputs:
         provider: 'azurerm'
         command: 'plan'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
         environmentServiceNameAzureRM: 'first_sc_nov'
