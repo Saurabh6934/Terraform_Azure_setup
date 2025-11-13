@@ -7,9 +7,11 @@ jobs:
     displayName: Init
     steps:
     - task: TerraformInstaller@1
+      displayName: Install Terraform
       inputs:
         terraformVersion: 'latest'
     - task: TerraformTask@5
+      displayName: Terraform Init
       inputs:
         provider: 'azurerm'
         command: 'init'
@@ -18,10 +20,12 @@ jobs:
         backendAzureRmContainerName: 'skp-container'
         backendAzureRmKey: 'saurabhtf.tfstate'
     - task: TerraformTask@5
+      displayName: Terraform Validate
       inputs:
         provider: 'azurerm'
         command: 'validate'
     - task: TerraformTask@5
+      displayName: Terraform fmt
       inputs:
         provider: 'azurerm'
         command: 'custom'
@@ -29,6 +33,7 @@ jobs:
         outputTo: 'console'
         environmentServiceNameAzureRM: 'first_sc_nov'
     - task: TerraformTask@5
+      displayName: Terraform Plan
       inputs:
         provider: 'azurerm'
         command: 'plan'
