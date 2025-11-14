@@ -12,3 +12,8 @@ module "Key_vault" {
   source     = "../../Modules/Key_Vault"
   key_vaults = var.key_vaults
 }
+
+module "public_ip" {
+  source     = "../../Modules/Public_Ip"
+  public_ips = var.public_ips
+}
