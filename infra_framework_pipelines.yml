@@ -63,6 +63,9 @@ stages:
       - job: 
         displayName: Apply
         steps:
+        - task: TerraformInstaller@1
+          inputs:
+            terraformVersion: 'latest'
         - task: TerraformTask@5
           displayName: Init 2
           inputs:
