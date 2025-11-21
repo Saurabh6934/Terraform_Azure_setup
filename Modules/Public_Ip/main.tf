@@ -6,6 +6,11 @@ locals {
   }
 }
 
+resource "random_string" "suffix" {
+  length  = 5
+  upper   = false
+  special = false
+}
 
 resource "azurerm_public_ip" "pip" {
   for_each = var.public_ips
@@ -13,7 +18,10 @@ resource "azurerm_public_ip" "pip" {
   name                = each.value.name
   resource_group_name = each.value.resource_group_name
   location            = each.value.location
-  allocation_method   = each.value.allocation_method
+  allocation_method = (
+  lookup(each.value, "sku", "Standard") == "Standard" ? "Static" : each.value.allocation_method
+)
+
 
   sku      = lookup(each.value, "sku", "Standard")
   sku_tier = lookup(each.value, "sku_tier", "Regional")
@@ -23,7 +31,11 @@ resource "azurerm_public_ip" "pip" {
   ip_version = lookup(each.value, "ip_version", "IPv4")
 
   # Domain name label (if specified)
-  domain_name_label = lookup(each.value, "domain_name_label", null)
+  domain_name_label = (
+  lookup(each.value, "domain_name_label", null) != null ?
+  "${lookup(each.value, "domain_name_label", null)}-${random_string.suffix.result}" :
+  null
+)
 
   # DDoS protection setup
   ddos_protection_mode = lookup(each.value, "ddos_protection_mode", "VirtualNetworkInherited")
