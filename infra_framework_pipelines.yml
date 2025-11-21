@@ -61,8 +61,10 @@ stages:
     dependsOn: Approval_stage
     jobs:
       - job: 
+        displayName: Apply
         steps:
         - task: TerraformTask@5
+          displayName: Init 2
           inputs:
             provider: 'azurerm'
             command: 'init'
@@ -72,6 +74,7 @@ stages:
             backendAzureRmContainerName: 'skp-container'
             backendAzureRmKey: 'saurabhtf.tfstate'
         - task: TerraformTask@5
+          displayName: Terraform Apply
           inputs:
             provider: 'azurerm'
             command: 'apply'
