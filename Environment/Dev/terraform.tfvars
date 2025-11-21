@@ -10,7 +10,7 @@ rgs = {
 vnets = {
   vnet1 = {
     name                = "frontend_vnet"
-    resource_group_name = "dev_rg"
+    resource_group_name = "dev_skp_rg"
     address_space       = ["10.0.0.0/16"]
     location            = "East US"
     tags = {
@@ -33,7 +33,7 @@ vnets = {
 key_vaults = {
   kv1 = {
     kv_name  = "dev-keyvault01"
-    rg_name  = "dev_rg"
+    rg_name  = "dev_skp_rg"
     location = "East US"
   }
 }
@@ -42,7 +42,7 @@ key_vaults = {
 public_ips = {
   app1 = {
     name                = "pip-chintu"
-    resource_group_name = "rg-prod"
+    resource_group_name = "dev_skp_rg"
     location            = "eastus"
     allocation_method   = "Static"
     zones               = ["1", "2"]
@@ -55,7 +55,7 @@ public_ips = {
 
   app2 = {
     name                = "pip-dhondhu"
-    resource_group_name = "rg-prod"
+    resource_group_name = "dev_skp_rg"
     location            = "westeurope"
     allocation_method   = "Dynamic"
     sku                 = "Basic"
