@@ -4,7 +4,7 @@ pool: skp-pool-nov
 
 stages:
   - stage: Install_Init_Validate_Fmt
-    displayName: Initial Check
+    displayName: Install_Init_Validate_Fmt
     jobs:
       - job: TF_Installation
         displayName: Terraform Install
