@@ -11,7 +11,7 @@ terraform {
     storage_account_name  = "skpstoragebackend"
     container_name        = "skp-container"
     key                   = "saurabhtf.tfstate"
-    use_azuread_auth      = true
+    subscription_id = "85002d33-efb7-4e6a-8e6d-7457837654e2"
   }
 
 }
@@ -20,3 +20,4 @@ provider "azurerm" {
   features {}
   subscription_id = "85002d33-efb7-4e6a-8e6d-7457837654e2"
 }
+
