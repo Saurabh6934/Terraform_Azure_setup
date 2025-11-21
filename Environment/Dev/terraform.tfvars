@@ -1,7 +1,7 @@
 # Resource group
 rgs = {
   rg1 = {
-    name     = "dev_rg"
+    name     = "dev_skp_rg"
     location = "East US"
   }
 }
