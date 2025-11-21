@@ -63,16 +63,16 @@ stages:
       - job: 
         displayName: Apply
         steps:
-        - task: TerraformTask@5
-          displayName: Init 2
-          inputs:
-            provider: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-            backendServiceArm: 'first_sc_nov'
-            backendAzureRmStorageAccountName: 'skpstoragebackend'
-            backendAzureRmContainerName: 'skp-container'
-            backendAzureRmKey: 'saurabhtf.tfstate'
+        # - task: TerraformTask@5
+        #   displayName: Init 2
+        #   inputs:
+        #     provider: 'azurerm'
+        #     command: 'init'
+        #     workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
+        #     backendServiceArm: 'first_sc_nov'
+        #     backendAzureRmStorageAccountName: 'skpstoragebackend'
+        #     backendAzureRmContainerName: 'skp-container'
+        #     backendAzureRmKey: 'saurabhtf.tfstate'
         - task: TerraformTask@5
           displayName: Terraform Apply
           inputs:
