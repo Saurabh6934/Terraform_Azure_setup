@@ -6,6 +6,7 @@ locals {
   }
 }
 
+
 resource "azurerm_public_ip" "pip" {
   for_each = var.public_ips
 

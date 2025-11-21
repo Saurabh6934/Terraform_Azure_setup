@@ -32,7 +32,7 @@ vnets = {
 # key vaults
 key_vaults = {
   kv1 = {
-    kv_name  = "dev-keyvault01"
+    kv_name  = "dev-skp-kv6934"
     rg_name  = "dev_skp_rg"
     location = "East US"
   }
@@ -41,7 +41,7 @@ key_vaults = {
 # Public IP
 public_ips = {
   app1 = {
-    name                = "pip-chintu"
+    name                = "pip-dev_skp"
     resource_group_name = "dev_skp_rg"
     location            = "eastus"
     allocation_method   = "Static"
@@ -54,11 +54,10 @@ public_ips = {
   }
 
   app2 = {
-    name                = "pip-dhondhu"
+    name                = "pip-dev_gkp"
     resource_group_name = "dev_skp_rg"
     location            = "westeurope"
-    allocation_method   = "Dynamic"
-    sku                 = "Basic"
+    allocation_method   = "Static"
     ip_version          = "IPv4"
     tags = {
       app = "backend"
