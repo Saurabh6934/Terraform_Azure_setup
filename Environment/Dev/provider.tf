@@ -5,6 +5,14 @@ terraform {
       version = "4.42.0"
     }
   }
+
+  backend "azurerm" {
+    resource_group_name   = "skp"
+    storage_account_name  = "skpstoragebackend"
+    container_name        = "skp-container"
+    key                   = "saurabhtf.tfstate"
+  }
+
 }
 
 provider "azurerm" {
