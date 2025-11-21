@@ -11,6 +11,7 @@ terraform {
     storage_account_name  = "skpstoragebackend"
     container_name        = "skp-container"
     key                   = "saurabhtf.tfstate"
+    use_azuread_auth      = true
   }
 
 }
