@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name   = "skp"
+    resource_group_name   = "skpcg"
     storage_account_name  = "skpstoragebackend"
     container_name        = "skp-container"
     key                   = "saurabhtf.tfstate"
