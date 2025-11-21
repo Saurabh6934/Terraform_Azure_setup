@@ -3,20 +3,15 @@ trigger: none
 pool: skp-pool-nov
 
 stages:
-  - stage: Install
+  - stage: Install_Init_Validate_Fmt
     displayName: Initial Check
     jobs:
-      - job: Installation
+      - job: TF_Installation
         displayName: Terraform Install
         steps:
         - task: TerraformInstaller@1
           inputs:
             terraformVersion: 'latest'
-  - stage: Init_Validate_Fmt
-    jobs:
-      - job: TF_Install
-        displayName: Init/Validate/Fmt/Plan
-        steps:
         - task: TerraformTask@5
           displayName: Terraform Init
           inputs:
@@ -43,21 +38,42 @@ stages:
             customCommand: 'fmt'
             environmentServiceNameAzureRM: 'first_sc_nov'
         - task: TerraformTask@5
-          displayName: Terraform Plan
           inputs:
             provider: 'azurerm'
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
             environmentServiceNameAzureRM: 'first_sc_nov'
 
-  # - stage: Terraform_scan
-  #   jobs:
-  #     - job: Terraform_scan
-  #       steps:
-  #       - task: tfsec@1
-  #         inputs:
-  #           version: 'v1.26.0'
-  
-  # - stage: Terraform_Plan
-        
+  - stage: Approval_stage
+    displayName: Approval stage
+    dependsOn: Install_Init_Validate_Fmt
+    pool: Server
+    jobs:
+      - job: 
+        displayName: Manual Validation
+        steps:
+        - task: ManualValidation@1
+          inputs:
+            notifyUsers: 'saurabhpatel320@gmail.com'
 
+  - stage: 
+    displayName: Apply
+    dependsOn: Approval_stage
+    jobs:
+      - job: 
+        steps:
+        - task: TerraformTask@5
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
+            backendServiceArm: 'first_sc_nov'
+            backendAzureRmStorageAccountName: 'skpstoragebackend'
+            backendAzureRmContainerName: 'skp-container'
+            backendAzureRmKey: 'saurabhtf.tfstate'
+        - task: TerraformTask@5
+          inputs:
+            provider: 'azurerm'
+            command: 'apply'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
+            environmentServiceNameAzureRM: 'first_sc_nov'
