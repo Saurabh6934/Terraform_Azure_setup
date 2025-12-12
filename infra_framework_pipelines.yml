@@ -26,7 +26,7 @@ stages:
             provider: 'azurerm'
             command: 'init'
             workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
-            backendServiceArm: 'first_sc_nov'
+            backendServiceArm: 'dec_sc1'
             backendAzureRmStorageAccountName: 'skpstoragebackend1'
             backendAzureRmContainerName: 'skp-container'
             backendAzureRmKey: '${{ parameters.env }}.tfstate'
@@ -44,13 +44,13 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
             outputTo: 'console'
             customCommand: 'fmt'
-            environmentServiceNameAzureRM: 'first_sc_nov'
+            environmentServiceNameAzureRM: 'dec_sc1'
         - task: TerraformTask@5
           inputs:
             provider: 'azurerm'
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
-            environmentServiceNameAzureRM: 'first_sc_nov'
+            environmentServiceNameAzureRM: 'dec_sc1'
 
   - stage: Approval_stage
     displayName: Approval stage
@@ -80,7 +80,7 @@ stages:
             provider: 'azurerm'
             command: 'init'
             workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
-            backendServiceArm: 'first_sc_nov'
+            backendServiceArm: 'dec_sc1'
             backendAzureRmStorageAccountName: 'skpstoragebackend1'
             backendAzureRmContainerName: 'skp-container'
             backendAzureRmKey: '${{ parameters.env }}.tfstate'
@@ -90,7 +90,7 @@ stages:
             provider: 'azurerm'
             command: 'apply'
             workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
-            environmentServiceNameAzureRM: 'first_sc_nov'
+            environmentServiceNameAzureRM: 'dec_sc1'
 
   - stage: Destroy_stage
     dependsOn: Apply_stage
@@ -107,7 +107,7 @@ stages:
           provider: 'azurerm'
           command: 'init'
           workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
-          backendServiceArm: 'first_sc_nov'
+          backendServiceArm: 'dec_sc1'
           backendAzureRmStorageAccountName: 'skpstoragebackend1'
           backendAzureRmContainerName: 'skp-container'
           backendAzureRmKey: '${{ parameters.env }}.tfstate'
@@ -116,5 +116,5 @@ stages:
           provider: 'azurerm'
           command: 'destroy'
           workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
-          environmentServiceNameAzureRM: 'first_sc_nov'
+          environmentServiceNameAzureRM: 'dec_sc1'
       
