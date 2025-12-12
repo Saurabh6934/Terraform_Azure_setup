@@ -8,16 +8,16 @@ terraform {
 
   backend "azurerm" {
     resource_group_name   = "skpcg"
-    storage_account_name  = "skpstoragebackend"
+    storage_account_name  = "skpstoragebackend1"
     container_name        = "skp-container"
     key                   = "saurabhtf.tfstate"
-    subscription_id = "85002d33-efb7-4e6a-8e6d-7457837654e2"
+    subscription_id = "b6571c78-f766-4999-8358-e9602abe50cf"
   }
 
 }
 
 provider "azurerm" {
   features {}
-  subscription_id = "85002d33-efb7-4e6a-8e6d-7457837654e2"
+  subscription_id = "b6571c78-f766-4999-8358-e9602abe50cf"
 }
 
