@@ -1,0 +1,224 @@
+
+trigger:
+  branches:
+    include:
+      - main
+      - master
+
+pr:
+  branches:
+    include:
+      - '*'
+
+pool: skp_pool_dec
+
+parameters:
+- name: env
+  displayName: Environment
+  type: string
+  values:
+  - dev
+  - prod
+
+- name: destroy
+  displayName: Run Destroy after Apply?
+  type: boolean
+  default: false
+
+variables:
+  # Prefer these from variable group in Library; leaving here for demo
+  backendServiceArm: 'dec_sc1'
+  backendStorageAccount: 'skpstoragebackend1'
+  backendContainer: 'skp-container'
+  tfstateKey: '${{ parameters.env }}.tfstate'
+  terraformDir: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
+  tfsecOutDir: '$(Build.SourcesDirectory)/tfsec-results'
+  planFileName: 'tfplan.out'  # binary plan for apply
+
+# Optional: stricter approvals when env=prod
+stages:
+
+# 1) Setup + Validate
+- stage: Validate
+  displayName: "Setup, Init, Fmt, Validate"
+  condition: succeeded()
+  jobs:
+    - job: TerraformChecks
+      displayName: "Terraform Installer + Init/Validate/Fmt"
+      steps:
+        - task: TerraformInstaller@1
+          displayName: "Install Terraform"
+          inputs:
+            terraformVersion: 'latest'
+
+        - task: TerraformTask@5
+          displayName: "Terraform Init"
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(terraformDir)'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+            backendAzureRmContainerName: '$(backendContainer)'
+            backendAzureRmKey: '$(tfstateKey)'
+
+        - task: TerraformTask@5
+          displayName: "Terraform Fmt -check"
+          inputs:
+            provider: 'azurerm'
+            command: 'custom'
+            workingDirectory: '$(terraformDir)'
+            customCommand: 'fmt -check -recursive'
+            outputTo: 'console'
+            environmentServiceNameAzureRM: '$(backendServiceArm)'
+
+        - task: TerraformTask@5
+          displayName: "Terraform Validate"
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+            workingDirectory: '$(terraformDir)'
+
+# 2) Security Scan (tfsec)
+- stage: Security
+  displayName: "Security Scan (tfsec)"
+  dependsOn: Validate
+  condition: succeeded()
+  jobs:
+    - job: TfsecScan
+      displayName: "Run tfsec"
+      steps:
+      - task: tfsec@1
+        inputs:
+          version: 'v1.26.0'
+          dir: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
+
+        # Publish reports
+      - task: PublishBuildArtifacts@1
+        displayName: "Publish tfsec reports"
+        inputs:
+          PathtoPublish: '$(tfsecOutDir)'
+          ArtifactName: 'tfsec-results'
+          publishLocation: 'Container'
+
+# 3) Plan (publish plan as artifact)
+- stage: Plan
+  displayName: "Terraform Plan"
+  dependsOn: Security
+  condition: succeeded()  # block Plan if tfsec failed (on prod)
+  jobs:
+    - job: TerraformPlan
+      displayName: "Plan and publish artifact"
+      steps:
+        - task: TerraformInstaller@1
+          displayName: "Install Terraform"
+          inputs:
+            terraformVersion: 'latest'
+
+        - task: TerraformTask@5
+          displayName: "Terraform Init 2(ensure backend)"
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(terraformDir)'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+            backendAzureRmContainerName: '$(backendContainer)'
+            backendAzureRmKey: '$(tfstateKey)'
+
+        - task: TerraformTask@5
+          displayName: "Terraform Plan (save binary)"
+          inputs:
+            provider: 'azurerm'
+            command: 'plan'
+            workingDirectory: '$(terraformDir)'
+            environmentServiceNameAzureRM: '$(backendServiceArm)'
+            commandOptions: '-out=$(planFileName)'
+
+        - task: PublishBuildArtifacts@1
+          displayName: "Publish plan artifact"
+          inputs:
+            PathtoPublish: '$(terraformDir)/$(planFileName)'
+            ArtifactName: 'tfplan'
+            publishLocation: 'Container'
+
+# 4) Approval (prefer environment approvals for prod)
+- stage: Approval
+  displayName: "Pre-Deployment Approval"
+  dependsOn: Plan
+  pool: Server
+  condition: succeeded()
+  jobs:
+    - job: ManualApproval
+      displayName: "Manual Validation Gate"
+      steps:
+        - task: ManualValidation@1
+          inputs:
+            instructions: 'Review tfsec results and Terraform plan artifact before approval.'
+            notifyUsers: 'saurabhpatel320@gmail.com'
+            onTimeout: 'reject'  # optional
+            timeout: '1d'
+
+
+
+# 5) Apply (consume the published plan)
+- stage: Apply
+  displayName: "Terraform Apply"
+  dependsOn: Approval
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))  # don’t apply on PR
+  jobs:
+    - job: TerraformApply
+      displayName: "Apply from plan"
+      steps:
+        - task: TerraformInstaller@1
+          displayName: "Install Terraform"
+          inputs:
+            terraformVersion: 'latest'
+
+        # Download plan artifact
+        - task: DownloadBuildArtifacts@0
+          displayName: "Download plan artifact"
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'tfplan'
+            downloadPath: '$(terraformDir)'
+
+        - task: TerraformTask@5
+          displayName: "Terraform Apply (from plan)"
+          inputs:
+            provider: 'azurerm'
+            command: 'apply'
+            workingDirectory: '$(terraformDir)'
+            environmentServiceNameAzureRM: '$(backendServiceArm)'
+            commandOptions: '$(planFileName) -auto-approve'
+
+# 6) Destroy (optional, behind parameter gate and approval)
+- stage: Destroy
+  displayName: "Terraform Destroy"
+  dependsOn: Apply
+  condition: and(succeeded(), eq('${{ parameters.destroy }}', 'true'))
+  jobs:
+    - job: TerraformDestroy
+      displayName: "Destroy (approved)"
+      steps:
+        - task: TerraformInstaller@1
+          inputs:
+            terraformVersion: 'latest'
+        - task: TerraformTask@5
+          displayName: "Init 3 (ensure backend)"
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(terraformDir)'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+            backendAzureRmContainerName: '$(backendContainer)'
+            backendAzureRmKey: '$(tfstateKey)'
+        - task: TerraformTask@5
+          displayName: "Terraform Destroy"
+          inputs:
+            provider: 'azurerm'
+            command: 'destroy'
+            workingDirectory: '$(terraformDir)'
+            environmentServiceNameAzureRM: '$(backendServiceArm)'
