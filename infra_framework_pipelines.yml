@@ -46,6 +46,7 @@ stages:
             customCommand: 'fmt'
             environmentServiceNameAzureRM: 'dec_sc1'
         - task: TerraformTask@5
+          displayName: Terraform Plan
           inputs:
             provider: 'azurerm'
             command: 'plan'
