@@ -26,7 +26,7 @@ parameters:
   default: false
 
 variables:
-  # Prefer these from variable group in Library; leaving here for demo
+  # In future i will Prefer these from variable group in Library
   backendServiceArm: 'dec_sc1'
   backendStorageAccount: 'skpstoragebackend1'
   backendContainer: 'skp-container'
