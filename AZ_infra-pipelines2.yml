@@ -68,8 +68,8 @@ stages:
             provider: 'azurerm'
             command: 'custom'
             workingDirectory: '$(terraformDir)'
-            customCommand: 'fmt -check -recursive'
             outputTo: 'console'
+            customCommand: 'fmt'
             environmentServiceNameAzureRM: '$(backendServiceArm)'
 
         - task: TerraformTask@5
