@@ -206,7 +206,6 @@ stages:
             command: 'apply'
             workingDirectory: '$(terraformDir)'
             environmentServiceNameAzureRM: '$(backendServiceArm)'
-            commandOptions: '$(planFileName) -auto-approve'
 
 # 6) Destroy (optional, behind parameter gate and approval)
 - stage: Destroy
