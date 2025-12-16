@@ -95,15 +95,15 @@ stages:
             version: 'v1.26.0'
             dir: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
 
-      #     args: '--format sarif --out $(tfsecOutDir)/tfsec.sarif --format html --out $(tfsecOutDir)/tfsec.html'
+#     args: '--format sarif --out $(tfsecOutDir)/tfsec.sarif --format html --out $(tfsecOutDir)/tfsec.html'
 
-      #   # Publish reports
-      # - task: PublishBuildArtifacts@1
-      #   displayName: "Publish tfsec reports"
-      #   inputs:
-      #     PathtoPublish: '$(tfsecOutDir)'
-      #     ArtifactName: 'tfsec-results'
-      #     publishLocation: 'Container'
+#   # Publish reports
+# - task: PublishBuildArtifacts@1
+#   displayName: "Publish tfsec reports"
+#   inputs:
+#     PathtoPublish: '$(tfsecOutDir)'
+#     ArtifactName: 'tfsec-results'
+#     publishLocation: 'Container'
 
 # 3) Plan (publish plan as artifact)
 - stage: Plan
