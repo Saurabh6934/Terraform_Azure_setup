@@ -178,6 +178,17 @@ stages:
           displayName: "Install Terraform"
           inputs:
             terraformVersion: 'latest'
+      
+        - task: TerraformTask@5
+          displayName: "Terraform Init 3(apply)"
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(terraformDir)'
+            backendServiceArm: '$(backendServiceArm)'
+            backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+            backendAzureRmContainerName: '$(backendContainer)'
+            backendAzureRmKey: '$(tfstateKey)'
 
         # Download plan artifact
         - task: DownloadBuildArtifacts@0
