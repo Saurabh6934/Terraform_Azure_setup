@@ -80,6 +80,7 @@ stages:
             workingDirectory: '$(terraformDir)'
 
 # 2) Security Scan (tfsec)
+
 - stage: Security
   displayName: "Security Scan (tfsec)"
   dependsOn: Validate
@@ -88,11 +89,12 @@ stages:
     - job: TfsecScan
       displayName: "Security scan (tfsec)"
       steps:
-      - task: tfsec@1
-        displayName: "Run tfsec"
-        inputs:
-          version: 'v1.26.0'
-          dir: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
+        - task: tfsec@1
+          displayName: "Run tfsec"
+          inputs:
+            version: 'v1.26.0'
+            dir: '$(System.DefaultWorkingDirectory)/Environment/${{ parameters.env }}'
+
       #     args: '--format sarif --out $(tfsecOutDir)/tfsec.sarif --format html --out $(tfsecOutDir)/tfsec.html'
 
       #   # Publish reports
